@@ -1,6 +1,7 @@
 let employeeList = [];
 const container = document.querySelector('.container');
 const search = document.getElementById('search');
+//get data from server
 const fetchEmployee = fetch('https://randomuser.me/api/?results=12')
 .then((response) => {
     return response.json();
@@ -9,6 +10,7 @@ const fetchEmployee = fetch('https://randomuser.me/api/?results=12')
     generateEmployeeHtml(data.results);
 });
 
+//Print DIV element for each Employee
 function generateEmployeeHtml(arr){
     let htmlForContainer = '';
     arr.forEach( a => {
@@ -41,6 +43,7 @@ container.addEventListener('click', (e) => {
     });
 });
 
+//eventlistener for input(search) field
 search.addEventListener('input', (e) => {
     const text = e.target.value.toLowerCase();
     const employee = document.querySelectorAll('.employee');
@@ -60,9 +63,11 @@ search.addEventListener('input', (e) => {
     }
 });
 
+//generate lightbox for each div-employee
 function generateLightBox(i, lengthEmployee){
     const div = document.createElement('div');
     div.className = 'lightbox';
+    //create html code for lightBox
     let htmlForLightBox = `
         <div class='lightbox-inside'>
             <img src='${employeeList[i].picture}' alt='${employeeList[i].name} profile picture'>
@@ -82,20 +87,54 @@ function generateLightBox(i, lengthEmployee){
     `;
     document.body.appendChild(div);
     const lightbox = document.querySelector('.lightbox');
+    //append html code in lightbox div
     lightbox.innerHTML = htmlForLightBox;
     
-    lightbox.addEventListener('click', (event) => {
-        if(event.target.className === 'xMark'){
-            lightbox.remove();
+    //remove eventlistener and remove lightbox container
+    function clear(){
+        document.removeEventListener('keyup', eventListener, false);
+        lightbox.remove();
+    }
+
+    //show previous or next lightbox
+    function changeLightBox(e, arr, typeCheck){
+        console.log(e.target);
+        let check;
+        typeCheck === 'className' ? check = e.target.className : check = e.key;
+
+        if(check === arr[0] || e.target.className === "lightbox"){
+           clear();
         } 
-        if(event.target.className === 'nextArrow' && lengthEmployee>i){
-            lightbox.remove();
+        if(check === arr[1] && lengthEmployee>i){
+            clear();
             generateLightBox(i+1, lengthEmployee);
-        } else if(event.target.className === 'backArrow' && i>0){
-            lightbox.remove();
+        } else if(check === arr[2] && i>0){
+            clear();
             generateLightBox(i-1, lengthEmployee);
         }
-    });
+    }
+
+    //event listener function which pass arguments on changelightbox function
+    function eventListener(){
+        //keys and classes for eventlistener
+        const clickClass = ['xMark','nextArrow','backArrow'];
+        const checkKeys = ['Escape', 'ArrowRight', 'ArrowLeft'];
+
+        //if click or keyup event
+        if(event.type === 'click'){
+        changeLightBox(event, clickClass, 'className');
+        } else if(event.type === 'keyup'){
+        changeLightBox(event, checkKeys, 'key');   
+        }
+    }
+
+
+
+    //event listener for click event
+    lightbox.addEventListener('click', eventListener);
+
+    //event listener for keypup event
+    document.addEventListener('keyup', eventListener);
 }
 
 
