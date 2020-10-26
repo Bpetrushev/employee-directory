@@ -102,7 +102,7 @@ function generateLightBox(i, lengthEmployee){
         let check;
         typeCheck === 'className' ? check = e.target.className : check = e.key;
 
-        if(check === arr[0] || e.target.className === "lightbox"){
+        if(check === arr[0] || e.target.className === 'lightbox'){
            clear();
         } 
         if(check === arr[1] && lengthEmployee>i){
